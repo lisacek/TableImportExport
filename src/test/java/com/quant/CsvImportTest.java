@@ -1,4 +1,4 @@
-package quant;
+package com.quant;
 
 import org.junit.jupiter.api.Test;
 
