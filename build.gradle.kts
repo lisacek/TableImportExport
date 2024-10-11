@@ -1,5 +1,6 @@
 plugins {
     application
+    id ("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 group = "quant"
@@ -12,7 +13,7 @@ java {
 }
 
 application {
-    mainClass.set("com.quant.MainWindow")
+    mainClass.set("com.quant.Main")
 }
 
 repositories {
@@ -32,4 +33,13 @@ tasks.test {
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
+}
+
+tasks {
+    build {
+        dependsOn(shadowJar)
+    }
+    jar {
+        enabled = false
+    }
 }
