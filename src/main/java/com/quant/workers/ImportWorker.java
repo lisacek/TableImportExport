@@ -2,8 +2,8 @@ package com.quant.workers;
 
 import com.quant.MainWindow;
 import com.quant.cons.ProductsImport;
-import com.quant.exceptions.InvalidFile;
-import com.quant.exceptions.UnsupportedFileType;
+import com.quant.exceptions.InvalidFileException;
+import com.quant.exceptions.UnsupportedFileTypeException;
 import com.quant.utils.CsvUtils;
 
 import javax.swing.*;
@@ -70,10 +70,10 @@ public class ImportWorker extends SwingWorker<Integer, Integer> {
 
             productsImport.finishImport(mainWindow);
             dialog.dispose();
-        } catch (UnsupportedFileType e) {
+        } catch (UnsupportedFileTypeException e) {
             JOptionPane.showMessageDialog(mainWindow, "Unsupported file type: "+ e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             return 1;
-        } catch (InvalidFile e) {
+        } catch (InvalidFileException e) {
             JOptionPane.showMessageDialog(mainWindow, "Invalid file: "+ e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             return 1;
         }

@@ -1,5 +1,7 @@
 package com.quant.cons;
 
+import com.quant.exceptions.UnsupportedFileTypeException;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -29,6 +31,10 @@ public class CSVFile {
     }
 
     public void loadData() {
+        if(!checkIfFileValid()) {
+            throw new UnsupportedFileTypeException("Unsupported file type");
+        }
+
         List<List<String>> data = new ArrayList<>();
         String line;
         try (BufferedReader br = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {

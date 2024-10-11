@@ -4,22 +4,16 @@ import com.quant.cons.CSVFile;
 import com.quant.cons.ProductsImport;
 import com.quant.cons.Product;
 import com.quant.enums.Head;
-import com.quant.exceptions.InvalidFile;
-import com.quant.exceptions.UnsupportedFileType;
+import com.quant.exceptions.InvalidFileException;
+import com.quant.exceptions.UnsupportedFileTypeException;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class CsvUtils {
 
-    public static void loadProducts(File file, ProductsImport productsImport) throws UnsupportedFileType, InvalidFile {
+    public static void loadProducts(File file, ProductsImport productsImport) throws UnsupportedFileTypeException, InvalidFileException {
         var csvFile = new CSVFile(file);
-
-        if(!csvFile.checkIfFileValid()) {
-            throw new UnsupportedFileType("Unsupported file type");
-        }
 
         var data = csvFile.getData();
         if(data.size() < 2) {
@@ -31,11 +25,21 @@ public class CsvUtils {
 
         for (var i = 0; i < firstRow.size(); i++) {
             var cellValue = firstRow.get(i);
-            var head = Head.getHead(cellValue);
+
+            Head head;
+            try {
+                head = Head.getHead(cellValue);
+            } catch (IllegalArgumentException e) {
+                throw new InvalidFileException("Invalid file format");
+            }
 
             if(head != null) {
                 columns.put(head, i);
             }
+        }
+
+        if(columns.size() != 5) {
+            throw new InvalidFileException("Invalid file format");
         }
 
         for (var i = 1; i < data.size(); i++) {
@@ -43,33 +47,56 @@ public class CsvUtils {
 
             var idColumn = row.get(columns.get(Head.PRODUCT_ID));
             if(idColumn == null || idColumn.isEmpty() || !ValidationUtils.isLong(idColumn)) {
-                throw new InvalidFile("Product ID is missing or invalid in row " + i);
+                throw new InvalidFileException("Product ID is missing or invalid in row " + i);
             }
 
-            var id = Long.parseLong(idColumn);
+            long id;
+            try {
+                id = Long.parseLong(idColumn);
+            } catch (NumberFormatException e) {
+                throw new InvalidFileException("Product ID is missing or invalid in row " + i);
+            }
+
             var brand = row.get(columns.get(Head.BRAND));
+            if(brand == null || brand.isEmpty()) {
+                throw new InvalidFileException("Brand is missing in row " + i);
+            }
+
             var name = row.get(columns.get(Head.NAME));
+            if(name == null || name.isEmpty()) {
+                throw new InvalidFileException("Name is missing in row " + i);
+            }
 
             var amountColumn = row.get(columns.get(Head.AMOUNT));
             if(amountColumn == null || amountColumn.isEmpty() || !ValidationUtils.isInteger(amountColumn)) {
-                throw new InvalidFile("Amount is missing or invalid in row " + i);
+                throw new InvalidFileException("Amount is missing or invalid in row " + i);
             }
 
-            var amount = Integer.parseInt(amountColumn);
+            long amount;
+            try {
+                amount = Long.parseLong(amountColumn);
+            } catch (NumberFormatException e) {
+                throw new InvalidFileException("Amount is missing or invalid in row " + i);
+            }
 
             var priceColumn = row.get(columns.get(Head.PRICE));
             if(priceColumn == null || priceColumn.isEmpty() || !ValidationUtils.isDouble(priceColumn)) {
-                throw new InvalidFile("Price is missing or invalid in row " + i);
+                throw new InvalidFileException("Price is missing or invalid in row " + i);
             }
 
-            var price = Double.parseDouble(priceColumn);
+            double price;
+            try {
+                price = Double.parseDouble(priceColumn);
+            } catch (NumberFormatException e) {
+                throw new InvalidFileException("Price is missing or invalid in row " + i);
+            }
+
             var product = new Product(id, brand, name, amount, price);
             productsImport.addProduct(product);
-
         }
     }
 
-    public static void loadProducts(ProductsImport productsImport) throws UnsupportedFileType, InvalidFile {
+    public static void loadProducts(ProductsImport productsImport) throws UnsupportedFileTypeException, InvalidFileException {
         for (var file : productsImport.getFiles()) {
             loadProducts(file, productsImport);
         }
