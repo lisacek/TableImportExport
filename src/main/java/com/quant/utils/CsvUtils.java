@@ -1,27 +1,20 @@
 package com.quant.utils;
 
 import com.quant.cons.CSVFile;
+import com.quant.cons.ProductsImport;
 import com.quant.cons.Product;
 import com.quant.enums.Head;
 import com.quant.exceptions.InvalidFile;
 import com.quant.exceptions.UnsupportedFileType;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 
-import javax.swing.*;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class CsvUtils {
 
-    public static List<Product> loadProducts(File file) throws UnsupportedFileType, InvalidFile {
-        var list = new ArrayList<Product>();
+    public static void loadProducts(File file, ProductsImport productsImport) throws UnsupportedFileType, InvalidFile {
         var csvFile = new CSVFile(file);
 
         if(!csvFile.checkIfFileValid()) {
@@ -30,7 +23,7 @@ public class CsvUtils {
 
         var data = csvFile.getData();
         if(data.size() < 2) {
-            return list;
+            return;
         }
 
         var columns = new HashMap<Head, Integer>();
@@ -71,27 +64,15 @@ public class CsvUtils {
 
             var price = Double.parseDouble(priceColumn);
             var product = new Product(id, brand, name, amount, price);
-            list.add(product);
-        }
+            productsImport.addProduct(product);
 
-        return list;
+        }
     }
 
-    public static List<Product> loadProducts(List<File> files, JProgressBar progressBar) throws UnsupportedFileType, InvalidFile {
-        var list = new ArrayList<Product>();
-        for (var file : files) {
-            var products = loadProducts(file);
-            if(progressBar != null) {
-                progressBar.setValue(progressBar.getValue() + 1);
-            }
-
-            for(var product : products) {
-                list.removeIf(p -> p.getId() == product.getId());
-                list.add(product);
-            }
+    public static void loadProducts(ProductsImport productsImport) throws UnsupportedFileType, InvalidFile {
+        for (var file : productsImport.getFiles()) {
+            loadProducts(file, productsImport);
         }
-
-        return list;
     }
 
 }

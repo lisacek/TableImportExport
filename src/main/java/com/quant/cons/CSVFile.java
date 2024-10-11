@@ -19,6 +19,15 @@ public class CSVFile {
         this.file = file;
     }
 
+    public long calculateLinesAmount() {
+        try (var lines = Files.lines(file.toPath())) {
+            return lines.count()-1;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     public void loadData() {
         List<List<String>> data = new ArrayList<>();
         String line;

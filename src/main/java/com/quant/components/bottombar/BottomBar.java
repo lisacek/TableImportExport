@@ -10,7 +10,6 @@ public class BottomBar implements Component {
 
     private JPanel panel;
 
-    private JProgressBar progressBar;
     private JLabel totalProducts;
 
 
@@ -18,11 +17,6 @@ public class BottomBar implements Component {
     public void init() {
         panel = new JPanel();
         panel.setLayout(new FlowLayout(FlowLayout.LEFT));
-
-        progressBar = new JProgressBar();
-        progressBar.setStringPainted(true);
-        progressBar.setVisible(false);
-        panel.add(progressBar, BorderLayout.SOUTH);
 
         totalProducts = new JLabel();
         totalProducts.setText("Total Products: 0");
@@ -32,10 +26,6 @@ public class BottomBar implements Component {
     @Override
     public JComponent render(MainWindow mainWindow) {
         return panel;
-    }
-
-    public JProgressBar getProgressBar() {
-        return progressBar;
     }
 
     public void setTotalProducts(int totalProducts) {
