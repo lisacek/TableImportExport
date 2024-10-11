@@ -2,7 +2,7 @@ package com.quant.cons;
 
 public class Product {
 
-    private final long id;
+    private long id;
     private String brand;
     private String name;
     private long amount;
@@ -18,6 +18,10 @@ public class Product {
 
     public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getBrand() {

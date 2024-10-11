@@ -2,11 +2,14 @@ package com.quant.components.table;
 
 import com.quant.MainWindow;
 import com.quant.components.Component;
+import com.quant.cons.CSVFile;
 import com.quant.cons.Product;
 import com.quant.enums.Column;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Table implements Component {
@@ -20,7 +23,7 @@ public class Table implements Component {
         Object[][] defaultTableData = {};
         tableModel = new DefaultTableModel(defaultTableData, new Object[]{"Product ID", "Name", "Brand", "Amount", "Price"});
 
-        table = new QTable(tableModel);
+        table = new QTable(tableModel, products);
         table.setToolTipText("Double click to edit");
         table.setFillsViewportHeight(true);
 
@@ -87,6 +90,30 @@ public class Table implements Component {
         }
 
         return products;
+    }
+
+    public List<List<String>> getData() {
+        var columnNames = table.getColumnNames();
+
+        var data = new ArrayList<List<String>>();
+        data.add(columnNames);
+
+        for (var product: products) {
+            var productData = new ArrayList<String>();
+            for (var column: columnNames) {
+                switch (column) {
+                    case "Product ID" -> productData.add(Long.toString(product.getId()));
+                    case "Name" -> productData.add(product.getName());
+                    case "Brand" -> productData.add(product.getBrand());
+                    case "Amount" -> productData.add(String.valueOf(product.getAmount()));
+                    case "Price" -> productData.add(String.valueOf(product.getPrice()));
+                }
+            }
+
+            data.add(productData);
+        }
+
+        return data;
     }
 
 }

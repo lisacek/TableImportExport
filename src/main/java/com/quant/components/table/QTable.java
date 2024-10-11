@@ -1,5 +1,6 @@
 package com.quant.components.table;
 
+import com.quant.cons.Product;
 import com.quant.enums.Column;
 import com.quant.exceptions.ColumnValidationFailedException;
 
@@ -10,8 +11,11 @@ import java.util.List;
 
 public class QTable extends JTable {
 
-    public QTable(DefaultTableModel model) {
+    private List<Product> products;
+
+    public QTable(DefaultTableModel model, List<Product> products) {
         super(model);
+        this.products = products;
     }
 
     @Override
@@ -35,6 +39,14 @@ public class QTable extends JTable {
             }
 
             super.setValueAt(newValue, rowIndex, columnIndex);
+            var product = products.get(rowIndex);
+            switch (column) {
+                case PRODUCT_ID -> product.setId(Long.parseLong(newValue));
+                case BRAND -> product.setBrand(newValue);
+                case NAME -> product.setName(newValue);
+                case AMOUNT -> product.setAmount(Integer.parseInt(newValue));
+                case PRICE -> product.setPrice(Double.parseDouble(newValue));
+            }
         } catch (ColumnValidationFailedException e) {
             super.setValueAt(previousValue, rowIndex, columnIndex);
             JOptionPane.showMessageDialog(null, e.getMessage());
@@ -57,4 +69,11 @@ public class QTable extends JTable {
         return columns;
     }
 
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
+    }
 }

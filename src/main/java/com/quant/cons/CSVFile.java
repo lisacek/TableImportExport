@@ -1,5 +1,6 @@
 package com.quant.cons;
 
+import com.quant.exceptions.FailedToSaveCSV;
 import com.quant.exceptions.UnsupportedFileTypeException;
 
 import java.io.BufferedReader;
@@ -14,7 +15,7 @@ import java.util.regex.Pattern;
 
 public class CSVFile {
 
-    private final File file;
+    private File file;
     private List<List<String>> data;
 
     public CSVFile(File file) {
@@ -90,6 +91,47 @@ public class CSVFile {
             return true;
         } catch (IOException e) {
             return false;
+        }
+    }
+
+    public void setFile(File file) {
+        this.file = file;
+    }
+
+    public void setData(List<List<String>> data) {
+        this.data = data;
+    }
+
+    public void save() throws FailedToSaveCSV {
+        var fileData = new StringBuilder();
+        for (var line : data) {
+            for (var value : line) {
+                if (value.contains(",") || value.contains("\"")) {
+                    value = value.replace("\"", "\"\"");
+                    value = "\"" + value + "\"";
+                }
+                fileData.append(value).append(",");
+            }
+            fileData.deleteCharAt(fileData.length()-1);
+            fileData.append("\n");
+        }
+
+        var charset = StandardCharsets.UTF_8;
+        if(!file.exists()) {
+            try {
+                var success = file.createNewFile();
+                if(!success) {
+                    throw new FailedToSaveCSV("Failed to create file: " + file.getName());
+                }
+            } catch (IOException e) {
+                throw new FailedToSaveCSV("Failed to create file: " + file.getName() +" " + e.getMessage());
+            }
+        }
+
+        try {
+            Files.writeString(file.toPath(), fileData.toString(), charset);
+        } catch (IOException e) {
+            throw new FailedToSaveCSV("Failed to save file: " + file.getName() +" " + e.getMessage());
         }
     }
 
