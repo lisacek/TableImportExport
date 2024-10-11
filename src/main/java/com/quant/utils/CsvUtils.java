@@ -3,7 +3,7 @@ package com.quant.utils;
 import com.quant.cons.CSVFile;
 import com.quant.cons.ProductsImport;
 import com.quant.cons.Product;
-import com.quant.enums.Head;
+import com.quant.enums.Column;
 import com.quant.exceptions.InvalidFileException;
 import com.quant.exceptions.UnsupportedFileTypeException;
 
@@ -20,15 +20,15 @@ public class CsvUtils {
             return;
         }
 
-        var columns = new HashMap<Head, Integer>();
+        var columns = new HashMap<Column, Integer>();
         var firstRow = data.get(0);
 
         for (var i = 0; i < firstRow.size(); i++) {
             var cellValue = firstRow.get(i);
 
-            Head head;
+            Column head;
             try {
-                head = Head.getHead(cellValue);
+                head = Column.getColumn(cellValue);
             } catch (IllegalArgumentException e) {
                 throw new InvalidFileException("Invalid file format");
             }
@@ -45,7 +45,7 @@ public class CsvUtils {
         for (var i = 1; i < data.size(); i++) {
             var row = data.get(i);
 
-            var idColumn = row.get(columns.get(Head.PRODUCT_ID));
+            var idColumn = row.get(columns.get(Column.PRODUCT_ID));
             if(idColumn == null || idColumn.isEmpty() || !ValidationUtils.isLong(idColumn)) {
                 throw new InvalidFileException("Product ID is missing or invalid in row " + i);
             }
@@ -57,17 +57,17 @@ public class CsvUtils {
                 throw new InvalidFileException("Product ID is missing or invalid in row " + i);
             }
 
-            var brand = row.get(columns.get(Head.BRAND));
+            var brand = row.get(columns.get(Column.BRAND));
             if(brand == null || brand.isEmpty()) {
                 throw new InvalidFileException("Brand is missing in row " + i);
             }
 
-            var name = row.get(columns.get(Head.NAME));
+            var name = row.get(columns.get(Column.NAME));
             if(name == null || name.isEmpty()) {
                 throw new InvalidFileException("Name is missing in row " + i);
             }
 
-            var amountColumn = row.get(columns.get(Head.AMOUNT));
+            var amountColumn = row.get(columns.get(Column.AMOUNT));
             if(amountColumn == null || amountColumn.isEmpty() || !ValidationUtils.isInteger(amountColumn)) {
                 throw new InvalidFileException("Amount is missing or invalid in row " + i);
             }
@@ -79,7 +79,7 @@ public class CsvUtils {
                 throw new InvalidFileException("Amount is missing or invalid in row " + i);
             }
 
-            var priceColumn = row.get(columns.get(Head.PRICE));
+            var priceColumn = row.get(columns.get(Column.PRICE));
             if(priceColumn == null || priceColumn.isEmpty() || !ValidationUtils.isDouble(priceColumn)) {
                 throw new InvalidFileException("Price is missing or invalid in row " + i);
             }

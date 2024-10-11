@@ -30,7 +30,7 @@ public class CSVFile {
         return 0;
     }
 
-    public void loadData() {
+    public void loadData() throws UnsupportedFileTypeException {
         if(!checkIfFileValid()) {
             throw new UnsupportedFileTypeException("Unsupported file type");
         }
@@ -60,7 +60,7 @@ public class CSVFile {
         return values;
     }
 
-    public List<List<String>> getData() {
+    public List<List<String>> getData() throws UnsupportedFileTypeException {
         if (data == null) {
             loadData();
         }

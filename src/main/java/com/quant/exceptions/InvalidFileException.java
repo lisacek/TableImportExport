@@ -1,6 +1,6 @@
 package com.quant.exceptions;
 
-public class InvalidFileException extends RuntimeException {
+public class InvalidFileException extends Exception {
 
     public InvalidFileException(String message) {
         super(message);

@@ -84,7 +84,6 @@ public class ImportWorker extends SwingWorker<Integer, Integer> {
 
     @Override
     protected void done() {
-        System.out.println("done");
         JLabel label = new JLabel("Task Complete");
         dialog.remove(progressBar);
         dialog.add(label);

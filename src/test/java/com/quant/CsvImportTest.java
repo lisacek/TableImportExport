@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class CsvImportTest {
 
     @Test
-    public void testValidCsvFile() {
+    public void testValidCsvFile() throws UnsupportedFileTypeException {
         var file = new File("src/test/resources/valid.csv");
         var csvFile = new CSVFile(file);
 
@@ -40,7 +40,7 @@ public class CsvImportTest {
         try {
             csvFile.loadData();
             CsvUtils.loadProducts(file, null);
-        } catch (Exception e) {
+        } catch (InvalidFileException | UnsupportedFileTypeException e) {
             exception = e;
         }
 
@@ -63,7 +63,7 @@ public class CsvImportTest {
     }
 
     @Test
-    public void testProductsImport() {
+    public void testProductsImport() throws InvalidFileException, UnsupportedFileTypeException {
         var file = new File("src/test/resources/valid.csv");
         var productsImport = new ProductsImport(List.of(file));
 

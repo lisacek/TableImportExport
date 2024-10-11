@@ -36,8 +36,6 @@ public class ImportButton implements TopBarAction {
 
             var worker = new ImportWorker(mainWindow, List.of(files));
             worker.execute();
-        } else{
-            System.out.println("No Selection ");
         }
     }
 
