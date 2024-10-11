@@ -1,6 +1,6 @@
 package com.quant.cons;
 
-import com.quant.exceptions.FailedToSaveCSV;
+import com.quant.exceptions.CSVExportFailedException;
 import com.quant.exceptions.UnsupportedFileTypeException;
 
 import java.io.BufferedReader;
@@ -102,7 +102,7 @@ public class CSVFile {
         this.data = data;
     }
 
-    public void save() throws FailedToSaveCSV {
+    public void save() throws CSVExportFailedException {
         var fileData = new StringBuilder();
         for (var line : data) {
             for (var value : line) {
@@ -121,17 +121,17 @@ public class CSVFile {
             try {
                 var success = file.createNewFile();
                 if(!success) {
-                    throw new FailedToSaveCSV("Failed to create file: " + file.getName());
+                    throw new CSVExportFailedException("Failed to create file: " + file.getName());
                 }
             } catch (IOException e) {
-                throw new FailedToSaveCSV("Failed to create file: " + file.getName() +" " + e.getMessage());
+                throw new CSVExportFailedException("Failed to create file: " + file.getName() +" " + e.getMessage());
             }
         }
 
         try {
             Files.writeString(file.toPath(), fileData.toString(), charset);
         } catch (IOException e) {
-            throw new FailedToSaveCSV("Failed to save file: " + file.getName() +" " + e.getMessage());
+            throw new CSVExportFailedException("Failed to save file: " + file.getName() +" " + e.getMessage());
         }
     }
 

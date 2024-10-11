@@ -43,6 +43,8 @@ public class ProductsImport {
         if (progressBar != null) {
             progressBar.setValue(MathUtils.calculatePercentage(products.size(), linesAmount));
             progressBar.setString("Loading lines... (" + products.size() + "/" + linesAmount + ")");
+            progressBar.revalidate();
+            progressBar.repaint();
         }
     }
 
@@ -51,6 +53,8 @@ public class ProductsImport {
             progressBar.setValue(0);
             progressBar.setMaximum(1);
             progressBar.setString("Merging data...");
+            progressBar.revalidate();
+            progressBar.repaint();
         }
 
         var table = mainWindow.getTable();

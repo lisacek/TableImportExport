@@ -4,14 +4,13 @@ import com.quant.MainWindow;
 import com.quant.components.topbar.TopBarAction;
 import com.quant.components.topbar.annotations.TopButton;
 import com.quant.components.topbar.filters.CSVFileFilter;
-import com.quant.workers.ImportWorker;
+import com.quant.workers.CSVImportWorker;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 import java.util.*;
 
 @TopButton(text = "Import from CSV")
-public class ImportButton implements TopBarAction {
+public class CSVImportButton implements TopBarAction {
 
     @Override
     public void actionPerformed(MainWindow mainWindow) {
@@ -28,7 +27,7 @@ public class ImportButton implements TopBarAction {
         var files = fileChooser.getSelectedFiles();
         if(files.length < 1) return;
 
-        var worker = new ImportWorker(mainWindow, List.of(files));
+        var worker = new CSVImportWorker(mainWindow, List.of(files));
         worker.execute();
     }
 

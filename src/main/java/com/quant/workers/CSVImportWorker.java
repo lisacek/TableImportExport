@@ -1,35 +1,35 @@
 package com.quant.workers;
 
 import com.quant.MainWindow;
-import com.quant.cons.CSVFile;
 import com.quant.cons.ProductsImport;
-import com.quant.exceptions.FailedToSaveCSV;
 import com.quant.exceptions.InvalidFileException;
 import com.quant.exceptions.UnsupportedFileTypeException;
 import com.quant.utils.CsvUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.List;
 
-public class ExportWorker extends SwingWorker<Integer, Integer> {
+public class CSVImportWorker extends SwingWorker<Integer, Integer> {
 
     private final MainWindow mainWindow;
-    private final File file;
+    private final List<File> files;
+
     private final JDialog dialog;
     private final JProgressBar progressBar = new JProgressBar();
 
-    public ExportWorker(MainWindow mainWindow, File file) {
+    public CSVImportWorker(MainWindow mainWindow, List<File> files) {
         this.mainWindow = mainWindow;
-        this.file = file;
+        this.files = files;
 
         progressBar.setString("Waiting...");
         progressBar.setStringPainted(true);
 
-        mainWindow.setEnabled(false);
-
         JButton cancelButton = new JButton("Cancel");
-        dialog = new JDialog(mainWindow, "Export Progress", true);
+        dialog = new JDialog(mainWindow, "Import Progress", false);
         dialog.setLayout(new BorderLayout());
 
         var progressPanel = new JPanel();
@@ -46,7 +46,6 @@ public class ExportWorker extends SwingWorker<Integer, Integer> {
         dialog.add(cancelButtonPanel, BorderLayout.SOUTH);
         dialog.setSize(300, 120);
         dialog.setLocationRelativeTo(null);
-        dialog.setModal(false);
         dialog.setVisible(true);
         dialog.setResizable(false);
 
@@ -54,45 +53,39 @@ public class ExportWorker extends SwingWorker<Integer, Integer> {
             cancel(true);
             dialog.dispose();
         });
+
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                cancel(true);
+                dialog.dispose();
+            }
+        });
     }
 
     @Override
     protected Integer doInBackground() {
-        var table = mainWindow.getTable();
         try {
             progressBar.setValue(0);
-            progressBar.setMaximum(1);
-            progressBar.setStringPainted(true);
+            var productsImport = new ProductsImport(files);
+            productsImport.setProgressBar(progressBar);
 
-            progressBar.setString("Getting products...");
-            var data = table.getData();
-            progressBar.setValue(1);
+            progressBar.setMaximum(100);
+            progressBar.setString("Loading lines... (0/"+ productsImport.getLinesAmount() +")");
+            dialog.pack();
 
-            progressBar.setValue(0);
-            progressBar.setString("Exporting...");
-            var csvFile = new CSVFile(file);
-            csvFile.setData(data);
-            csvFile.save();
+            CsvUtils.loadProducts(productsImport);
 
-            progressBar.setMaximum(1);
-            progressBar.setString("Done!");
+            productsImport.finishImport(mainWindow);
             dialog.dispose();
-        } catch (FailedToSaveCSV e) {
-            throw new RuntimeException(e);
+        } catch (UnsupportedFileTypeException | InvalidFileException e) {
+            JOptionPane.showMessageDialog(mainWindow, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            dialog.dispose();
+            return 1;
         }
 
         return 0;
     }
 
-
-    @Override
-    protected void done() {
-        JLabel label = new JLabel("Task Complete");
-        dialog.remove(progressBar);
-        dialog.add(label);
-        dialog.validate();
-
-        mainWindow.setEnabled(true);
-    }
 
 }

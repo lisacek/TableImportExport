@@ -4,28 +4,31 @@ import com.quant.MainWindow;
 import com.quant.components.topbar.TopBarAction;
 import com.quant.components.topbar.annotations.TopButton;
 import com.quant.components.topbar.filters.CSVFileFilter;
-import com.quant.workers.ExportWorker;
-import com.quant.workers.ImportWorker;
+import com.quant.workers.CSVExportWorker;
 
 import javax.swing.*;
-import java.util.List;
 
 @TopButton(text = "Export to CSV")
-public class ExportButton implements TopBarAction {
+public class CSVExportButton implements TopBarAction {
 
     @Override
     public void actionPerformed(MainWindow mainWindow) {
+        if(mainWindow.getTable().getProducts().size() == 0) {
+            JOptionPane.showMessageDialog(mainWindow, "No data to export", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         var fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Export to CSV");
 
-        fileChooser.addChoosableFileFilter(new CSVFileFilter());
+        fileChooser.setFileFilter(new CSVFileFilter());
         var option = fileChooser.showSaveDialog(mainWindow);
 
         if(option != JFileChooser.APPROVE_OPTION) {
             return;
         }
 
-        var worker = new ExportWorker(mainWindow, fileChooser.getSelectedFile());
+        var worker = new CSVExportWorker(mainWindow, fileChooser.getSelectedFile());
         worker.execute();
     }
 

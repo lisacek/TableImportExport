@@ -3,8 +3,9 @@ package com.quant.components.topbar;
 import com.quant.MainWindow;
 import com.quant.components.Component;
 import com.quant.components.topbar.annotations.TopButton;
-import com.quant.components.topbar.impl.ExportButton;
-import com.quant.components.topbar.impl.ImportButton;
+import com.quant.components.topbar.impl.CSVExportButton;
+import com.quant.components.topbar.impl.CSVImportButton;
+import com.quant.components.topbar.impl.ExcelExportButton;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,8 +22,9 @@ public class TopBar implements Component {
         panel = new JPanel();
         panel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-        actions.add(new ImportButton());
-        actions.add(new ExportButton());
+        actions.add(new CSVImportButton());
+        actions.add(new CSVExportButton());
+        actions.add(new ExcelExportButton());
     }
 
     @Override
