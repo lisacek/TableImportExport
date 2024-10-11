@@ -3,6 +3,7 @@ package com.quant.utils;
 import java.io.File;
 import java.io.FileFilter;
 import java.lang.reflect.ParameterizedType;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -24,6 +25,20 @@ public class ReflectionUtils {
                 if ("file".equals(protocol)) {
                     var filePath = URLDecoder.decode(url.getFile(), StandardCharsets.UTF_8);
                     findClassesInPackage(packageName, filePath, classes);
+                } else if ("jar".equals(protocol)) {
+                    try (var jar = ((JarURLConnection) url.openConnection()).getJarFile()) {
+                        jar.stream().forEach(entry -> {
+                            var name = entry.getName();
+                            if (name.startsWith(packageName.replace(".", "/")) && name.endsWith(".class")) {
+                                var className = name.replace("/", ".").substring(0, name.length() - 6);
+                                try {
+                                    classes.add(Thread.currentThread().getContextClassLoader().loadClass(className));
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
                 }
             }
         } catch (Exception e) {

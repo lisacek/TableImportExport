@@ -4,6 +4,7 @@ import com.quant.frames.Frame;
 import com.quant.managers.Manager;
 import com.quant.utils.ReflectionUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,10 +20,9 @@ public class FramesManager implements Manager {
         for (var clazz : classes) {
             try {
                 frames.add((Frame) clazz.getConstructor().newInstance());
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
+                     InvocationTargetException e) {
                 e.printStackTrace();
-            } catch (NoSuchMethodException | java.lang.reflect.InvocationTargetException e) {
-                throw new RuntimeException(e);
             }
         }
     }
@@ -46,11 +46,7 @@ public class FramesManager implements Manager {
     }
 
     public <T extends Frame> T getFrame(Class<T> clazz) {
-        return frames.stream()
-                .filter(frame -> frame.getClass().equals(clazz))
-                .map(clazz::cast)
-                .findFirst()
-                .orElse(null);
+        return frames.stream().filter(clazz::isInstance).map(clazz::cast).findFirst().orElse(null);
     }
 
 }
