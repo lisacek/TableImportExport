@@ -1,0 +1,32 @@
+Name,Product ID,Brand,Price,Amount
+"Boty sportovní, modré",200040,Bootas,599.00,400
+"Boty sportovní, šedé",200041,Bootas,629.00,250
+"Boty sportovní, červené",200043,Bootas,629.00,100
+"Batoh červený",200046,Mr.Bag,500.00,10
+"Batoh mini modrý",200050,Sherpan,1499.99,70
+"Batoh mini zelený",200051,Sherpan,1249.99,150
+"Batoh retro",200056,Wox,1000.00,0
+"Boty semišové",200101,Rodrigo,2999.99,1
+"Boty sportovní, černé",200102,Bootas,699.00,200
+"Boty městské, černé",200103,Bootas,499.00,300
+"Boty městské, hnědé",200104,Bootas,599.00,150
+"Boty trekové, hnědé",200105,Sherpan,799.00,50
+"Boty trekové, modré",200106,Sherpan,999.00,25
+"Boty trekové, šedé",200107,Sherpan,1099.00,10
+"Batoh outdoor",200108,Mr.Bag,699.00,20
+"Batoh outdoor mini",200109,Mr.Bag,499.00,30
+"Batoh outdoor pro ženy",200110,Mr.Bag,599.00,10
+"Batoh pro přenášení notebooku",200111,Wox,699.00,5
+"Batoh pro školu",200112,Wox,499.00,40
+"Boty na zimu, černé",200113,Bootas,799.00,25
+"Boty na zimu, hnědé",200114,Bootas,849.00,15
+"Boty na zimu, šedé",200115,Bootas,899.00,10
+"Boty na zimu, bílé",200116,Bootas,949.00,5
+"Boty na zimu, modré",200117,Bootas,999.00,2
+"Boty na zimu, červené",200118,Bootas,1049.00,1
+"Boty na sněžnice",200119,Sherpan,1299.00,5
+"Boty na lyže",200120,Sherpan,1599.00,3
+"Boty na běžky",200121,Sherpan,1999.00,2
+"Batoh pro horolezce",200122,Mr.Bag,799.00,5
+"Batoh pro cyklisty",200123,Mr.Bag,699.00,10
+"Batoh pro turisty",200124,Mr.Bag,599.00,15

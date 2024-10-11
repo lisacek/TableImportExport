@@ -1,5 +1,6 @@
 package com.quant.components.topbar.impl;
 
+import com.quant.MainWindow;
 import com.quant.components.topbar.TopBarAction;
 import com.quant.components.topbar.annotations.TopButton;
 
@@ -9,11 +10,11 @@ import javax.swing.*;
 public class ExportButton implements TopBarAction {
 
     @Override
-    public void actionPerformed(JFrame frame) {
+    public void actionPerformed(MainWindow mainWindow) {
         var fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Export to CSV");
 
-        var option = fileChooser.showSaveDialog(frame);
+        var option = fileChooser.showSaveDialog(mainWindow);
 
         if(option == JFileChooser.APPROVE_OPTION){
             var file = fileChooser.getSelectedFile();

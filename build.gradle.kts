@@ -12,7 +12,7 @@ java {
 }
 
 application {
-    mainClass.set("quant.MainWindow")
+    mainClass.set("com.quant.MainWindow")
 }
 
 repositories {
@@ -28,4 +28,8 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
 }

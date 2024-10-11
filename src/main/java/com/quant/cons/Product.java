@@ -48,8 +48,22 @@ public class Product {
         return price;
     }
 
+    public String getFormattedPrice() {
+        return String.format("%.2f Kč", price);
+    }
+
     public void setPrice(double price) {
         this.price = price;
     }
 
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", brand='" + brand + '\'' +
+                ", name='" + name + '\'' +
+                ", amount=" + amount +
+                ", price=" + price +
+                '}';
+    }
 }

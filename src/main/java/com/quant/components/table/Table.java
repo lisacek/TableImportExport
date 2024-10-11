@@ -1,11 +1,14 @@
 package com.quant.components.table;
 
+import com.quant.MainWindow;
 import com.quant.components.Component;
 import com.quant.cons.Product;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+import java.util.Arrays;
 import java.util.List;
 
 public class Table implements Component {
@@ -27,7 +30,7 @@ public class Table implements Component {
     }
 
     @Override
-    public JComponent render(JFrame frame) {
+    public JComponent render(MainWindow mainWindow) {
         return table;
     }
 
@@ -39,7 +42,7 @@ public class Table implements Component {
                     product.getName(),
                     product.getBrand(),
                     product.getAmount(),
-                    product.getPrice()
+                    product.getFormattedPrice()
             };
         }
         tableModel = new DefaultTableModel(tableData, new Object[]{"Product ID", "Name", "Brand", "Amount", "Price"});
@@ -48,9 +51,14 @@ public class Table implements Component {
 
     public void setProducts(List<Product> products) {
         this.products = products;
+        renderUpdatedTable();
     }
 
     public List<Product> getProducts() {
+        if (products == null) {
+            return List.of();
+        }
+
         return products;
     }
 

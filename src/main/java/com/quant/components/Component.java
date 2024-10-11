@@ -1,11 +1,13 @@
 package com.quant.components;
 
+import com.quant.MainWindow;
+
 import javax.swing.*;
 
 public interface Component {
 
     void init();
 
-    JComponent render(JFrame frame);
+    JComponent render(MainWindow mainWindow);
 
 }

@@ -1,5 +1,6 @@
 package com.quant;
 
+import com.quant.components.bottombar.BottomBar;
 import com.quant.components.table.Table;
 import com.quant.components.topbar.TopBar;
 
@@ -15,6 +16,9 @@ public class MainWindow extends JFrame {
         new MainWindow().setVisible(true);
     }
 
+    private final Table table;
+    private final BottomBar bottomBar;
+
     public MainWindow() {
         setTitle("Table Import / Export");
         setSize(1200, 800);
@@ -27,8 +31,20 @@ public class MainWindow extends JFrame {
         bar.init();
         add(bar.render(this), BorderLayout.NORTH);
 
-        var table = new Table();
+        bottomBar = new BottomBar();
+        bottomBar.init();
+        add(bottomBar.render(this), BorderLayout.SOUTH);
+
+        table = new Table();
         table.init();
         add(new JScrollPane(table.render(this)), BorderLayout.CENTER);
+    }
+
+    public Table getTable() {
+        return table;
+    }
+
+    public BottomBar getBottomBar() {
+        return bottomBar;
     }
 }

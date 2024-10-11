@@ -1,5 +1,6 @@
 package com.quant.components.topbar;
 
+import com.quant.MainWindow;
 import com.quant.components.Component;
 import com.quant.components.topbar.annotations.TopButton;
 import com.quant.components.topbar.impl.ExportButton;
@@ -25,7 +26,7 @@ public class TopBar implements Component {
     }
 
     @Override
-    public JPanel render(JFrame frame) {
+    public JPanel render(MainWindow mainWindow) {
         actions.forEach(action -> {
             var annotation = action.getClass().getAnnotation(TopButton.class);
             if(annotation == null) {
@@ -33,7 +34,7 @@ public class TopBar implements Component {
             }
 
             JButton button = new JButton(annotation.text());
-            button.addActionListener(e -> action.actionPerformed(frame));
+            button.addActionListener(e -> action.actionPerformed(mainWindow));
             panel.add(button);
         });
 
