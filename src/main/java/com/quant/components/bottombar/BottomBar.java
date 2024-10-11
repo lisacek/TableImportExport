@@ -1,11 +1,14 @@
 package com.quant.components.bottombar;
 
-import com.quant.MainWindow;
+import com.quant.annotations.ComponentInfo;
 import com.quant.components.Component;
 
 import javax.swing.*;
 import java.awt.*;
 
+@ComponentInfo(
+        borderLayout = BorderLayout.SOUTH
+)
 public class BottomBar implements Component {
 
     private JPanel panel;
@@ -24,7 +27,7 @@ public class BottomBar implements Component {
     }
 
     @Override
-    public JComponent render(MainWindow mainWindow) {
+    public JComponent getJComponent() {
         return panel;
     }
 

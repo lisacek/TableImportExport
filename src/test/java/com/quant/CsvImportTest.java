@@ -4,7 +4,12 @@ import com.quant.cons.CSVFile;
 import com.quant.cons.ProductsImport;
 import com.quant.exceptions.InvalidFileException;
 import com.quant.exceptions.UnsupportedFileTypeException;
+import com.quant.managers.Managers;
+import com.quant.managers.impl.ColumnsManager;
+import com.quant.managers.impl.ProductsManager;
 import com.quant.utils.CsvUtils;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -14,6 +19,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CsvImportTest {
+
+    @BeforeEach
+    public void setupManagers() {
+        Managers.add(ColumnsManager.class);
+        Managers.getManager(ProductsManager.class);
+        Managers.init();
+        Managers.start();
+    }
 
     @Test
     public void testValidCsvFile() throws UnsupportedFileTypeException {

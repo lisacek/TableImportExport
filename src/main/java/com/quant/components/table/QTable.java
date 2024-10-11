@@ -1,21 +1,24 @@
 package com.quant.components.table;
 
+import com.quant.annotations.ColumnName;
+import com.quant.columns.Column;
 import com.quant.cons.Product;
-import com.quant.enums.Column;
 import com.quant.exceptions.ColumnValidationFailedException;
+import com.quant.managers.Managers;
+import com.quant.managers.impl.ColumnsManager;
+import com.quant.managers.impl.ProductsManager;
+import com.quant.utils.ReflectionUtils;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class QTable extends JTable {
 
-    private List<Product> products;
-
-    public QTable(DefaultTableModel model, List<Product> products) {
+    public QTable(DefaultTableModel model) {
         super(model);
-        this.products = products;
     }
 
     @Override
@@ -23,7 +26,7 @@ public class QTable extends JTable {
         var previousValue = getValueAt(rowIndex, columnIndex);
 
         var columnName = this.dataModel.getColumnName(columnIndex);
-        var column = Column.getColumn(columnName);
+        var column = Managers.getManager(ColumnsManager.class).getByColumnName(columnName);
 
         if(column == null) {
             super.setValueAt(value, rowIndex, columnIndex);
@@ -31,22 +34,26 @@ public class QTable extends JTable {
         }
 
         try {
-            column.validate(value.toString());
-            var newValue = value.toString();
-            if(column == Column.PRICE) {
-                var parsedDouble = Double.parseDouble(newValue);
-                newValue = String.format("%.2f Kč", parsedDouble);
+            column.getValidator().validate(value.toString());
+            var products = Managers.getManager(ProductsManager.class).getProducts();
+            var product = products.get(rowIndex);
+
+            Object normalizedValue = ReflectionUtils.normalizeValue(value, column.getValueType());
+            for (var productColumn : Product.class.getDeclaredFields()) {
+                if (productColumn.isAnnotationPresent(ColumnName.class)) {
+                    var annotation = productColumn.getAnnotation(ColumnName.class);
+                    if (annotation.value().equals(columnName)) {
+                        try {
+                            productColumn.setAccessible(true);
+                            productColumn.set(product, normalizedValue);
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
             }
 
-            super.setValueAt(newValue, rowIndex, columnIndex);
-            var product = products.get(rowIndex);
-            switch (column) {
-                case PRODUCT_ID -> product.setId(Long.parseLong(newValue));
-                case BRAND -> product.setBrand(newValue);
-                case NAME -> product.setName(newValue);
-                case AMOUNT -> product.setAmount(Integer.parseInt(newValue));
-                case PRICE -> product.setPrice(Double.parseDouble(newValue));
-            }
+            super.setValueAt(column.formatDisplayValue(normalizedValue), rowIndex, columnIndex);
         } catch (ColumnValidationFailedException e) {
             super.setValueAt(previousValue, rowIndex, columnIndex);
             JOptionPane.showMessageDialog(null, e.getMessage());
@@ -54,7 +61,8 @@ public class QTable extends JTable {
     }
 
     public List<Column> getColumns() {
-        return getColumnNames().stream().map(Column::getColumn).toList();
+        var columnsManager = Managers.getManager(ColumnsManager.class);
+        return getColumnNames().stream().map(columnsManager::getByColumnName).collect(Collectors.toList());
     }
 
     public List<String> getColumnNames() {
@@ -69,11 +77,25 @@ public class QTable extends JTable {
         return columns;
     }
 
-    public List<Product> getProducts() {
-        return products;
+    public ArrayList<Object> getRowData(int row) throws IllegalAccessException {
+        var columns = getColumnNames();
+        var products = Managers.getManager(ProductsManager.class).getProducts();
+        var product = products.get(row);
+        var values = new ArrayList<>();
+        for (var column : columns) {
+            var fields = product.getClass().getDeclaredFields();
+            for (var field : fields) {
+                if (field.getName().equalsIgnoreCase(column) || field.isAnnotationPresent(ColumnName.class) && field.getAnnotation(ColumnName.class).value().equalsIgnoreCase(column)) {
+                    field.setAccessible(true);
+                    values.add(field.get(product).toString());
+                }
+            }
+        }
+
+        return values;
     }
 
-    public void setProducts(List<Product> products) {
-        this.products = products;
+    public ArrayList<String> getRowDataString(int row) throws IllegalAccessException {
+        return getRowData(row).stream().map(Object::toString).collect(Collectors.toCollection(ArrayList::new));
     }
 }

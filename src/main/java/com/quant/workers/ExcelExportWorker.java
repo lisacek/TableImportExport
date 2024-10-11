@@ -1,9 +1,9 @@
 package com.quant.workers;
 
-import com.quant.MainWindow;
-import com.quant.cons.CSVFile;
-import com.quant.exceptions.CSVExportFailedException;
+import com.quant.frames.impl.MainFrame;
 import com.quant.exceptions.ExcelExportFailedException;
+import com.quant.managers.Managers;
+import com.quant.managers.impl.ProductsManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,22 +15,20 @@ import java.io.IOException;
 
 public class ExcelExportWorker extends SwingWorker<Integer, Integer> {
 
-    private final MainWindow mainWindow;
+    private final MainFrame mainFrame;
     private final File file;
     private final JDialog dialog;
     private final JProgressBar progressBar = new JProgressBar();
 
-    public ExcelExportWorker(MainWindow mainWindow, File file) {
-        this.mainWindow = mainWindow;
+    public ExcelExportWorker(MainFrame mainFrame, File file) {
+        this.mainFrame = mainFrame;
         this.file = file;
 
         progressBar.setString("Waiting...");
         progressBar.setStringPainted(true);
 
-        mainWindow.setEnabled(false);
-
         JButton cancelButton = new JButton("Cancel");
-        dialog = new JDialog(mainWindow, "Export Progress", false);
+        dialog = new JDialog(mainFrame, "Export Progress", false);
         dialog.setLayout(new BorderLayout());
 
         var progressPanel = new JPanel();
@@ -66,14 +64,14 @@ public class ExcelExportWorker extends SwingWorker<Integer, Integer> {
 
     @Override
     protected Integer doInBackground() {
-        var table = mainWindow.getTable();
+        var productsManager = Managers.getManager(ProductsManager.class);
         try {
             progressBar.setValue(0);
             progressBar.setMaximum(1);
             progressBar.setStringPainted(true);
 
             progressBar.setString("Getting products...");
-            var data = table.getExcelData(file);
+            var data = productsManager.getWorkbook();
             progressBar.setValue(1);
 
             progressBar.setValue(0);
@@ -91,21 +89,13 @@ public class ExcelExportWorker extends SwingWorker<Integer, Integer> {
             progressBar.setMaximum(1);
             progressBar.setString("Done!");
             dialog.dispose();
-        } catch (ExcelExportFailedException | IOException e) {
-            JOptionPane.showMessageDialog(mainWindow, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(mainFrame, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             dialog.dispose();
-            done();
             return 1;
         }
 
         return 0;
-    }
-
-
-    @Override
-    protected void done() {
-        System.out.println("Done");
-        mainWindow.setEnabled(true);
     }
 
 }

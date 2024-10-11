@@ -1,6 +1,8 @@
 package com.quant.cons;
 
-import com.quant.MainWindow;
+import com.quant.frames.impl.MainFrame;
+import com.quant.managers.Managers;
+import com.quant.managers.impl.ProductsManager;
 import com.quant.utils.MathUtils;
 
 import javax.swing.*;
@@ -48,7 +50,7 @@ public class ProductsImport {
         }
     }
 
-    public void finishImport(MainWindow mainWindow) {
+    public void finishImport() {
         if (progressBar != null) {
             progressBar.setValue(0);
             progressBar.setMaximum(1);
@@ -57,15 +59,12 @@ public class ProductsImport {
             progressBar.repaint();
         }
 
-        var table = mainWindow.getTable();
-        var oldProducts = table.getProducts();
+        var productsManager = Managers.getManager(ProductsManager.class);
+        var oldProducts = productsManager.getProducts();
         products.removeIf(product -> oldProducts.stream().anyMatch(oldProduct -> oldProduct.getId() == product.getId()));
         products.addAll(oldProducts);
 
-        table.setProducts(products);
-
-        mainWindow.setEnabled(true);
-        mainWindow.getBottomBar().setTotalProducts(products.size());
+        productsManager.setProducts(products);
     }
 
     public long getLinesAmount() {

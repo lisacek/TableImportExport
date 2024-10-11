@@ -1,6 +1,6 @@
 package com.quant.workers;
 
-import com.quant.MainWindow;
+import com.quant.frames.impl.MainFrame;
 import com.quant.cons.ProductsImport;
 import com.quant.exceptions.InvalidFileException;
 import com.quant.exceptions.UnsupportedFileTypeException;
@@ -15,21 +15,21 @@ import java.util.List;
 
 public class CSVImportWorker extends SwingWorker<Integer, Integer> {
 
-    private final MainWindow mainWindow;
+    private final MainFrame mainFrame;
     private final List<File> files;
 
     private final JDialog dialog;
     private final JProgressBar progressBar = new JProgressBar();
 
-    public CSVImportWorker(MainWindow mainWindow, List<File> files) {
-        this.mainWindow = mainWindow;
+    public CSVImportWorker(MainFrame mainFrame, List<File> files) {
+        this.mainFrame = mainFrame;
         this.files = files;
 
         progressBar.setString("Waiting...");
         progressBar.setStringPainted(true);
 
         JButton cancelButton = new JButton("Cancel");
-        dialog = new JDialog(mainWindow, "Import Progress", false);
+        dialog = new JDialog(mainFrame, "Import Progress", false);
         dialog.setLayout(new BorderLayout());
 
         var progressPanel = new JPanel();
@@ -76,10 +76,11 @@ public class CSVImportWorker extends SwingWorker<Integer, Integer> {
 
             CsvUtils.loadProducts(productsImport);
 
-            productsImport.finishImport(mainWindow);
+            productsImport.finishImport();
             dialog.dispose();
-        } catch (UnsupportedFileTypeException | InvalidFileException e) {
-            JOptionPane.showMessageDialog(mainWindow, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(mainFrame, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             dialog.dispose();
             return 1;
         }

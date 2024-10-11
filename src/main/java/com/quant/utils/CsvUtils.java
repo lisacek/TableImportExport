@@ -1,11 +1,14 @@
 package com.quant.utils;
 
+import com.quant.columns.Column;
 import com.quant.cons.CSVFile;
-import com.quant.cons.ProductsImport;
 import com.quant.cons.Product;
-import com.quant.enums.Column;
+import com.quant.cons.ProductsImport;
+import com.quant.exceptions.ColumnValidationFailedException;
 import com.quant.exceptions.InvalidFileException;
 import com.quant.exceptions.UnsupportedFileTypeException;
+import com.quant.managers.Managers;
+import com.quant.managers.impl.ColumnsManager;
 
 import java.io.File;
 import java.util.HashMap;
@@ -16,83 +19,57 @@ public class CsvUtils {
         var csvFile = new CSVFile(file);
 
         var data = csvFile.getData();
-        if(data.size() < 2) {
+        if (data.size() < 2) {
             return;
         }
 
-        var columns = new HashMap<Column, Integer>();
+        var columns = new HashMap<Integer, Class<? extends Column>>();
         var firstRow = data.get(0);
 
         for (var i = 0; i < firstRow.size(); i++) {
             var cellValue = firstRow.get(i);
 
-            Column head;
-            try {
-                head = Column.getColumn(cellValue);
-            } catch (IllegalArgumentException e) {
+            var head = Managers.getManager(ColumnsManager.class).getByColumnName(cellValue);
+            if (head == null) {
                 throw new InvalidFileException("Invalid file format");
             }
 
-            if(head != null) {
-                columns.put(head, i);
-            }
+            columns.put(i, head.getClass());
         }
 
-        if(columns.size() != 5) {
+        if (columns.size() != 5) {
             throw new InvalidFileException("Invalid file format");
         }
 
         for (var i = 1; i < data.size(); i++) {
             var row = data.get(i);
+            var rowData = new HashMap<Column, Object>();
 
-            var idColumn = row.get(columns.get(Column.PRODUCT_ID));
-            if(idColumn == null || idColumn.isEmpty() || !ValidationUtils.isLong(idColumn)) {
-                throw new InvalidFileException("Product ID is missing or invalid in row " + i);
+            for (var rowIndex = 0; rowIndex < row.size(); rowIndex++) {
+                var column = Managers.getManager(ColumnsManager.class).getColumn(columns.get(rowIndex));
+                if (column == null) {
+                    continue;
+                }
+
+                try {
+                    column.getValidator().validate(row.get(rowIndex));
+                } catch (ColumnValidationFailedException e) {
+                    throw new InvalidFileException("column validation failed in row " + i + " column " + column.getName() +" : "+ e.getMessage());
+                }
+
+                rowData.put(column, row.get(rowIndex));
             }
 
-            long id;
             try {
-                id = Long.parseLong(idColumn);
-            } catch (NumberFormatException e) {
-                throw new InvalidFileException("Product ID is missing or invalid in row " + i);
-            }
+                var product = new Product();
+                for (var entry : rowData.entrySet()) {
+                    entry.getKey().assignValue(product, entry.getValue());
+                }
 
-            var brand = row.get(columns.get(Column.BRAND));
-            if(brand == null || brand.isEmpty()) {
-                throw new InvalidFileException("Brand is missing in row " + i);
+                productsImport.addProduct(product);
+            } catch (Exception e) {
+                throw new InvalidFileException("Invalid file format");
             }
-
-            var name = row.get(columns.get(Column.NAME));
-            if(name == null || name.isEmpty()) {
-                throw new InvalidFileException("Name is missing in row " + i);
-            }
-
-            var amountColumn = row.get(columns.get(Column.AMOUNT));
-            if(amountColumn == null || amountColumn.isEmpty() || !ValidationUtils.isInteger(amountColumn)) {
-                throw new InvalidFileException("Amount is missing or invalid in row " + i);
-            }
-
-            long amount;
-            try {
-                amount = Long.parseLong(amountColumn);
-            } catch (NumberFormatException e) {
-                throw new InvalidFileException("Amount is missing or invalid in row " + i);
-            }
-
-            var priceColumn = row.get(columns.get(Column.PRICE));
-            if(priceColumn == null || priceColumn.isEmpty() || !ValidationUtils.isDouble(priceColumn)) {
-                throw new InvalidFileException("Price is missing or invalid in row " + i);
-            }
-
-            double price;
-            try {
-                price = Double.parseDouble(priceColumn);
-            } catch (NumberFormatException e) {
-                throw new InvalidFileException("Price is missing or invalid in row " + i);
-            }
-
-            var product = new Product(id, brand, name, amount, price);
-            productsImport.addProduct(product);
         }
     }
 

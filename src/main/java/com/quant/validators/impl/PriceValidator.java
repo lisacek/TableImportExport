@@ -22,7 +22,7 @@ public class PriceValidator implements Validator {
             throw new ColumnValidationFailedException("Price cannot be negative");
         }
 
-        if (price * 100 % 1 != 0) {
+        if (Double.toString(price).split("\\.")[1].length() > 2 ) {
             throw new ColumnValidationFailedException("Price cannot have more than 2 decimal places");
         }
     }

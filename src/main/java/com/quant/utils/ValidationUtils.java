@@ -29,8 +29,4 @@ public class ValidationUtils {
         }
     }
 
-    public static boolean isBoolean(String value) {
-        return value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false");
-    }
-
 }
